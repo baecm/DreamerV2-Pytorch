@@ -1,5 +1,7 @@
 ### HYPERPARAMETERS ###
-save_path = "save.chkpt"
+model_path = 'result/model/'
+image_path = 'result/image/'
+
 env_name = "Qbert-v0"
 
 batch = 64
