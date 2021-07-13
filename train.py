@@ -17,8 +17,8 @@ from model import WorldModel, Actor, Critic, LossModel, ActorLoss, CriticLoss
 from config import *
 # plt.ion()
 
-
 env = gym.make(env_name, frameskip = 4)
+num_actions = env.action_space.n
 
 ### MODELS ###
 world = WorldModel(gamma, num_actions).cuda()

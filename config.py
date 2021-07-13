@@ -1,7 +1,6 @@
 ### HYPERPARAMETERS ###
 save_path = "save.chkpt"
 env_name = "Qbert-v0"
-num_actions = env.action_space.n
 
 batch = 64
 L = 50 #seq len world training
