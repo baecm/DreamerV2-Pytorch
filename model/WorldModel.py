@@ -238,27 +238,16 @@ class LossModel(nn.Module):
         self.nq = nq
 
     def forward(self, x, r, gamma, z_logits, z_sample, x_hat, r_hat, gamma_hat, z_hat_logits):
-        x_dist = torch.distributions.normal.Normal(
-            loc=x_hat,
-            scale=1.0
-        )
-        r_dist = torch.distributions.normal.Normal(
-            loc=r_hat,
-            scale=1.0
-        )
-        gamma_dist = torch.distributions.bernoulli.Bernoulli(
-            logits=gamma_hat
-        )
-        z_hat_dist = torch.distributions.one_hot_categorical.OneHotCategorical(
-            logits=z_hat_logits.reshape(-1, 32, 32)
-        )
-        z_dist = torch.distributions.one_hot_categorical.OneHotCategorical(
-            logits=z_logits.reshape(-1, 32, 32).detach()
-        )
-
+        x_dist = torch.distributions.normal.Normal(loc=x_hat, scale=1.0)
+        r_dist = torch.distributions.normal.Normal(loc=r_hat, scale=1.0)
+        gamma_dist = torch.distributions.bernoulli.Bernoulli(logits=gamma_hat)
+        # z_hat_dist = torch.distributions.one_hot_categorical.OneHotCategorical(logits=z_hat_logits.reshape(-1, 32, 32))
+        z_hat_dist = torch.distributions.one_hot_categorical.OneHotCategorical(logits=z_hat_logits.reshape(-1, 32, 32), validate_args=False)
+        # z_dist = torch.distributions.one_hot_categorical.OneHotCategorical(logits=z_logits.reshape(-1, 32, 32).detach())
+        z_dist = torch.distributions.one_hot_categorical.OneHotCategorical(logits=z_logits.reshape(-1, 32, 32).detach(), validate_args=False)
         z_sample = z_sample.reshape(-1, 32, 32)
 
-        loss = -self.nx * x_dist.log_prob(x).mean() \
+        loss = - self.nx * x_dist.log_prob(x).mean() \
                - self.nr * r_dist.log_prob(r).mean() \
                - self.ng * gamma_dist.log_prob(gamma.round()).mean() \
                - self.nt * z_hat_dist.log_prob(z_sample.detach()).mean() \

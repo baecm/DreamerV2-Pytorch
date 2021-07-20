@@ -2,7 +2,7 @@
 model_path = 'result/model/'
 image_path = 'result/image/'
 
-env_name = "Qbert-v0"
+env_name = "Pong-v0"
 
 batch = 64
 L = 50 #seq len world training
