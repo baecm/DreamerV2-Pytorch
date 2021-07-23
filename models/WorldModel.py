@@ -82,7 +82,7 @@ class WorldModel(nn.Module):
         """
         In:
             batch_size: int
-            device: torch.device of the common
+            device: torch.device of the models
             a: a_t-1
             h: h_t-1
             z: z_t-1

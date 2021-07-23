@@ -16,7 +16,7 @@ import warnings
 warnings.filterwarnings(action='ignore')
 
 from config import *
-from common import *
+from models import *
 from dataset import ModelDataset
 
 
@@ -100,7 +100,7 @@ def main():
             optim_critic.load_state_dict(w["optim_critic"])
             criterionActor = ActorLoss(*w["criterionActor"])
         except:
-            print("error loading common")
+            print("error loading models")
             world = WorldModel(gamma, num_actions).cuda()
             actor = Actor(num_actions).cuda()
             critic = Critic().cuda()
@@ -145,7 +145,7 @@ def main():
             z_list = []
             h_list = []
 
-            ### Train world common ###
+            ### Train world models ###
             z_logit, z_sample, z_hat_logits, x_hat, r_hat, gamma_hat, h, _ = world(
                 a=None,
                 x=s[:, 0],
