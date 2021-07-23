@@ -80,7 +80,7 @@ def main():
     critic = Critic().cuda()
     target = Critic().cuda()
 
-    criterionModel = LossModel().cuda()
+    criterionModel = WorldModelLoss().cuda()
     criterionActor = ActorLoss().cuda()
     criterionCritic = CriticLoss().cuda()
 
@@ -105,7 +105,7 @@ def main():
             actor = Actor(num_actions).cuda()
             critic = Critic().cuda()
             target = Critic().cuda()
-            criterionModel = LossModel().cuda()
+            criterionModel = WorldModelLoss().cuda()
             criterionActor = ActorLoss().cuda()
             criterionCritic = CriticLoss().cuda()
             optim_model = Adam(world.parameters(), lr=lr_world, eps=adam_eps, weight_decay=decay)

@@ -1,2 +1,3 @@
 from .actor import *
-from .worldmodel import *
+from .critic import *
+from .worldmodels import *
