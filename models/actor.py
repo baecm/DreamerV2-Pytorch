@@ -21,23 +21,6 @@ class Actor(nn.Module):
         return self.model(z_sample) * 2
 
 
-class Critic(nn.Module):
-    def __init__(self):
-        super(Critic, self).__init__()
-
-        self.model = nn.Sequential(
-            nn.Linear(32 * 32, 512),
-            nn.ELU(inplace=True),
-            nn.Linear(512, 256),
-            nn.ELU(inplace=True),
-            nn.Linear(256, 1),
-        )
-
-    def forward(self, z_sample):
-        z_sample = z_sample.reshape(-1, 32 * 32)
-        return self.model(z_sample)
-
-
 class ActorLoss(nn.Module):
     def __init__(self, ns=0.9, nd=0.1, ne=3e-3):
         super(ActorLoss, self).__init__()
@@ -57,13 +40,3 @@ class ActorLoss(nn.Module):
         self.ne = max(3e-4, self.ne - self.anneal)
 
         return loss.mean()
-
-
-class CriticLoss(nn.Module):
-    def __init__(self):
-        super(CriticLoss, self).__init__()
-
-        self.mse = nn.MSELoss()
-
-    def forward(self, V, ve):
-        return self.mse(V, ve)

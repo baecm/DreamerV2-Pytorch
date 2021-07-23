@@ -1,2 +1,2 @@
-from .ActorCritic import *
-from .WorldModel import *
+from .actor import *
+from .worldmodel import *
