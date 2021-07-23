@@ -82,7 +82,7 @@ class WorldModel(nn.Module):
         """
         In:
             batch_size: int
-            device: torch.device of the model
+            device: torch.device of the common
             a: a_t-1
             h: h_t-1
             z: z_t-1
@@ -241,10 +241,8 @@ class LossModel(nn.Module):
         x_dist = torch.distributions.normal.Normal(loc=x_hat, scale=1.0)
         r_dist = torch.distributions.normal.Normal(loc=r_hat, scale=1.0)
         gamma_dist = torch.distributions.bernoulli.Bernoulli(logits=gamma_hat)
-        # z_hat_dist = torch.distributions.one_hot_categorical.OneHotCategorical(logits=z_hat_logits.reshape(-1, 32, 32))
-        z_hat_dist = torch.distributions.one_hot_categorical.OneHotCategorical(logits=z_hat_logits.reshape(-1, 32, 32), validate_args=False)
-        # z_dist = torch.distributions.one_hot_categorical.OneHotCategorical(logits=z_logits.reshape(-1, 32, 32).detach())
-        z_dist = torch.distributions.one_hot_categorical.OneHotCategorical(logits=z_logits.reshape(-1, 32, 32).detach(), validate_args=False)
+        z_hat_dist = torch.distributions.one_hot_categorical.OneHotCategorical(logits=z_hat_logits.reshape(-1, 32, 32))
+        z_dist = torch.distributions.one_hot_categorical.OneHotCategorical(logits=z_logits.reshape(-1, 32, 32).detach())
         z_sample = z_sample.reshape(-1, 32, 32)
 
         loss = - self.nx * x_dist.log_prob(x).mean() \

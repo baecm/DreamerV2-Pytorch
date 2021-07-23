@@ -16,7 +16,7 @@ import warnings
 warnings.filterwarnings(action='ignore')
 
 from config import *
-from model import *
+from common import *
 from dataset import ModelDataset
 
 
@@ -37,16 +37,16 @@ def gather_episode(env, world, actor, tensor_range, history, device='cuda'):
             obs = env.reset()
             obs = transform_obs(obs)
             episode = [obs]
-            obs = obs.to(device)
+            obs = obs.cuda()
             z_sample, h = world(None, obs, None, inference=True)
             done = False
             while not done:
-                # env.render()
+                env.render()
                 a = actor(z_sample)
                 a = torch.distributions.one_hot_categorical.OneHotCategorical(logits=a).sample()
                 obs, rew, done, _ = env.step(int((a.cpu() * tensor_range).sum().round()))  # take a random action (int)
                 obs = transform_obs(obs)
-                obs = obs.to(device)
+                obs = obs.cuda()
                 episode.extend([a.cpu(), tanh(rew), done, obs.cpu()])
                 if not done:
                     z_sample, h = world(a, obs, z_sample.reshape(-1, 1024), h, inference=True)
@@ -69,20 +69,20 @@ def act_straight_through(actor, z_hat_sample):
 
 
 def main():
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     ### ENVIRONMENT ###
     env = gym.make(env_name, frameskip=4)
     num_actions = env.action_space.n
 
     ### MODELS ###
-    world = WorldModel(gamma, num_actions).to(device)
-    actor = Actor(num_actions).to(device)
-    critic = Critic().to(device)
-    target = Critic().to(device)
+    world = WorldModel(gamma, num_actions).cuda()
+    actor = Actor(num_actions).cuda()
+    critic = Critic().cuda()
+    target = Critic().cuda()
 
-    criterionModel = LossModel().to(device)
-    criterionActor = ActorLoss().to(device)
-    criterionCritic = CriticLoss().to(device)
+    criterionModel = LossModel().cuda()
+    criterionActor = ActorLoss().cuda()
+    criterionCritic = CriticLoss().cuda()
 
     optim_model = Adam(world.parameters(), lr=lr_world, eps=adam_eps, weight_decay=decay)
     optim_actor = Adam(actor.parameters(), lr=lr_actor, eps=adam_eps, weight_decay=decay)
@@ -100,14 +100,14 @@ def main():
             optim_critic.load_state_dict(w["optim_critic"])
             criterionActor = ActorLoss(*w["criterionActor"])
         except:
-            print("error loading model")
-            world = WorldModel(gamma, num_actions).to(device)
-            actor = Actor(num_actions).to(device)
-            critic = Critic().to(device)
-            target = Critic().to(device)
-            criterionModel = LossModel().to(device)
-            criterionActor = ActorLoss().to(device)
-            criterionCritic = CriticLoss().to(device)
+            print("error loading common")
+            world = WorldModel(gamma, num_actions).cuda()
+            actor = Actor(num_actions).cuda()
+            critic = Critic().cuda()
+            target = Critic().cuda()
+            criterionModel = LossModel().cuda()
+            criterionActor = ActorLoss().cuda()
+            criterionCritic = CriticLoss().cuda()
             optim_model = Adam(world.parameters(), lr=lr_world, eps=adam_eps, weight_decay=decay)
             optim_actor = Adam(actor.parameters(), lr=lr_actor, eps=adam_eps, weight_decay=decay)
             optim_critic = Adam(critic.parameters(), lr=lr_critic, eps=adam_eps, weight_decay=decay)
@@ -138,14 +138,14 @@ def main():
     while True:
         pbar = tqdm(loader)
         for s, a, r, g in pbar:
-            s = s.to(device)
-            a = a.to(device)
-            r = r.to(device)
-            g = g.to(device)
+            s = s.cuda()
+            a = a.cuda()
+            r = r.cuda()
+            g = g.cuda()
             z_list = []
             h_list = []
 
-            ### Train world model ###
+            ### Train world common ###
             z_logit, z_sample, z_hat_logits, x_hat, r_hat, gamma_hat, h, _ = world(
                 a=None,
                 x=s[:, 0],
