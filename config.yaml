@@ -1,0 +1,33 @@
+default: &default
+  device: cuda
+  seed: 1337
+
+  model_path: result/model/
+  image_path: result/image/
+
+  capacity: 1e6
+  batch_size: 64
+  sequence_length: 50
+  history_size: 64
+
+  learning_rate:
+    world: 2e-4
+    actor: 4e-5
+    critic: 1e-4
+
+  H: 15
+  gamma: 0.995
+  labmda: 0.95
+  target_interval: 100
+
+  gradient_clipping: 100
+  adam_eps: 1e-5
+  decay: 1e-6
+
+atari_pong:
+  <<: *default
+  env_name: Pong-v0
+  action_repeat: 4
+  image_size: [84, 84]
+  grayscale: True
+
